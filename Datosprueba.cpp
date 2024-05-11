@@ -1,7 +1,9 @@
+
 #include <iostream>
 #include <fstream>
 #include <string>
-// Sin el arreglo de los datos 
+#include <iomanip>
+
 using namespace std;
 
 // Definición de la estructura DatosMeteorologicos
@@ -14,30 +16,28 @@ struct DatosMeteorologicos
     int humedad;
     int velocidadViento;
     int presionAtmosferica;
-    string condicionMeteorologica;
+    char condicionMeteorologica[20]; // Tamaño suficiente para almacenar la condición meteorológica
 };
 
-// Función para agregar datos meteorológicos al archivo binario
-void agregarDatosMeteorologicos(const string& nombreArchivo)
+// Función para escribir los datos meteorológicos en un archivo binario
+void escribirDatosMeteorologicos(const string& nombreArchivo)
 {
-    // Pedir al usuario que ingrese los nuevos datos meteorológicos
-    DatosMeteorologicos nuevoDato;
-    cout << "Ingrese la fecha (en el formato AAAA MM DD): ";
-    cin >> nuevoDato.anio >> nuevoDato.mes >> nuevoDato.dia;
-    cout << "Ingrese la temperatura (C): ";
-    cin >> nuevoDato.temperatura;
-    cout << "Ingrese la humedad (%): ";
-    cin >> nuevoDato.humedad;
-    cout << "Ingrese la velocidad del viento (km/h): ";
-    cin >> nuevoDato.velocidadViento;
-    cout << "Ingrese la presión atmosférica (hPa): ";
-    cin >> nuevoDato.presionAtmosferica;
-    cout << "Ingrese la condición meteorológica: ";
-    cin.ignore(); // Limpiar el buffer del teclado
-    getline(cin, nuevoDato.condicionMeteorologica);
+    // Arreglo de datos meteorológicos proporcionados
+    DatosMeteorologicos datos[] = {
+        {2020, 1, 1, 17.9, 74, 7, 1008, "Nublado"}, 
+        {2020, 1, 2, 18.7, 64, 19, 1028, "Lluvioso"},
+        {2020, 1, 3, 24.7, 76, 8, 1021, "Lluvioso"},
+        {2020, 1, 4, 24.6, 57, 6, 1027, "Nublado"},
+        {2020, 1, 5, 27.4, 34, 20, 1019, "Soleado"},
+        {2020, 1, 6, 14.3, 51, 15, 1019, "Lluvioso"},
+        {2020, 1, 7, 15.5, 51, 3, 1021, "Soleado"},
+        {2020, 1, 8, 12.4, 58, 7, 1003, "Nublado"},
+        {2020, 1, 9, 22.1, 58, 9, 1019, "Lluvioso"},
+        {2020, 1, 10, 19.5, 57, 20, 1017, "Nublado"}
+    };
 
-    // Abrir el archivo en modo escritura binaria (en modo append para agregar al final)
-    ofstream archivo(nombreArchivo, ios::out | ios::binary | ios::app);
+    // Abrir el archivo en modo escritura binaria
+    ofstream archivo(nombreArchivo, ios::out | ios::binary);
 
     // Verificar si el archivo se abrió correctamente
     if (!archivo)
@@ -46,49 +46,24 @@ void agregarDatosMeteorologicos(const string& nombreArchivo)
         return;
     }
 
-    // Escribir el nuevo dato meteorológico en el archivo
-    archivo.write(reinterpret_cast<const char*>(&nuevoDato), sizeof(DatosMeteorologicos));
+    // Escribir los datos meteorológicos en el archivo
+    for (const auto& dato : datos)
+    {
+        archivo.write(reinterpret_cast<const char*>(&dato), sizeof(DatosMeteorologicos));
+    }
 
     // Cerrar el archivo
     archivo.close();
 
     // Mostrar mensaje de éxito
-    cout << "Datos meteorológicos agregados correctamente." << endl;
+    cout << "Datos meteorológicos escritos en el archivo binario: " << nombreArchivo << endl;
 }
 
-// Función para mostrar todos los datos meteorológicos almacenados en el archivo binario
-void mostrarTodosLosDatos(const string& nombreArchivo)
-{
-    ifstream archivoLectura(nombreArchivo, ios::binary);
-    if (!archivoLectura)
-    {
-        cerr << "Error al abrir el archivo para lectura." << endl;
-        return;
-    }
-
-    DatosMeteorologicos datoLeido;
-
-    // Leer y mostrar todos los datos meteorológicos almacenados en el archivo
-    cout << "Todos los datos meteorológicos almacenados:" << endl;
-    while (archivoLectura.read(reinterpret_cast<char*>(&datoLeido), sizeof(DatosMeteorologicos)))
-    {
-        cout << "Fecha: " << datoLeido.anio << "-" << datoLeido.mes << "-" << datoLeido.dia << endl;
-        cout << "Temperatura (C): " << datoLeido.temperatura << endl;
-        cout << "Humedad (%): " << datoLeido.humedad << endl;
-        cout << "Velocidad del Viento (km/h): " << datoLeido.velocidadViento << endl;
-        cout << "Presión Atmosférica (hPa): " << datoLeido.presionAtmosferica << endl;
-        cout << "Condición Meteorológica: " << datoLeido.condicionMeteorologica << endl;
-        cout << endl;
-    }
-
-    archivoLectura.close();
-}
-
-// Función para buscar y mostrar los datos meteorológicos de una fecha específica
+// Función para leer y mostrar los datos meteorológicos de una fecha específica
 void mostrarDatosPorFecha(const string& nombreArchivo)
 {
     int anio, mes, dia;
-    cout << "Digite alguna entre el rango 2020-01-01 hasta 2020-01-10 (en el formato AA MM DD): ";
+    cout << "Digite una fecha entre el rango 2020-01-01 hasta 2020-01-10 (en el formato AA MM DD): ";
     cin >> anio >> mes >> dia;
 
     ifstream archivoLectura(nombreArchivo, ios::binary);
@@ -125,33 +100,52 @@ void mostrarDatosPorFecha(const string& nombreArchivo)
     archivoLectura.close();
 }
 
+// Función para mostrar todos los datos meteorológicos almacenados en el archivo
+void mostrarTodosLosDatos(const string& nombreArchivo)
+{
+    ifstream archivoLectura(nombreArchivo, ios::binary);
+    if (!archivoLectura)
+    {
+        cerr << "Error al abrir el archivo para lectura." << endl;
+        return;
+    }
+
+    DatosMeteorologicos datoLeido;
+
+    cout << "Todos los datos meteorológicos:" << endl;
+    cout << setw(4) << "Año" << setw(4) << "Mes" << setw(4) << "Día" << setw(10) << "Temperatura" << setw(8) << "Humedad" << setw(20) << "Condición" << endl;
+    while (archivoLectura.read(reinterpret_cast<char*>(&datoLeido), sizeof(DatosMeteorologicos)))
+    {
+        cout << setw(4) << datoLeido.anio << setw(4) << datoLeido.mes << setw(4) << datoLeido.dia << setw(10) << datoLeido.temperatura << setw(8) << datoLeido.humedad << setw(20) << datoLeido.condicionMeteorologica << endl;
+    }
+
+    archivoLectura.close();
+}
+
 int main()
 {
     int opcion;
-    const string nombreArchivo = "datos.bin";
 
     do
     {
-        // Mostrar el menú
         cout << "\n--- Menú ---" << endl;
-        cout << "1. Agregar datos meteorologicos" << endl;
-        cout << "2. Mostrar todos los datos meteorologicos" << endl;
-        cout << "3. Buscar datos meteorologicos por fecha" << endl;
+        cout << "1. Agregar datos meteorológicos" << endl;
+        cout << "2. Mostrar todos los datos meteorológicos" << endl;
+        cout << "3. Buscar datos meteorológicos por fecha" << endl;
         cout << "4. Salir" << endl;
         cout << "Opción: ";
         cin >> opcion;
 
-        // Realizar la opción seleccionada
         switch (opcion)
         {
             case 1:
-                agregarDatosMeteorologicos(nombreArchivo);
+                escribirDatosMeteorologicos("datos.bin");
                 break;
             case 2:
-                mostrarTodosLosDatos(nombreArchivo);
+                mostrarTodosLosDatos("datos.bin");
                 break;
             case 3:
-                mostrarDatosPorFecha(nombreArchivo);
+                mostrarDatosPorFecha("datos.bin");
                 break;
             case 4:
                 cout << "Saliendo..." << endl;
@@ -164,3 +158,9 @@ int main()
 
     return 0;
 }
+
+
+
+// Este codigo implemneta un menu de agregar buscar y mostrar datos meteorologicos
+// Tambien utiliza un arregl donde se escribe las priemars 10 fechas de los datos meteorologicos
+// y se almacena en un archivo txt 

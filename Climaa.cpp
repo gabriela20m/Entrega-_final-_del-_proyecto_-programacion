@@ -23,7 +23,7 @@ void escribirDatosMeteorologicos(const string& nombreArchivo)
 {
     // Arreglo de datos meteorológicos proporcionados
     DatosMeteorologicos datos[] = {
-        {2020, 1, 1, 17.9, 74, 7, 1008, "Nublado"},
+        {2020, 1, 1, 17.9, 74, 7, 1008, "Nublado"}, 
         {2020, 1, 2, 18.7, 64, 19, 1028, "Lluvioso"},
         {2020, 1, 3, 24.7, 76, 8, 1021, "Lluvioso"},
         {2020, 1, 4, 24.6, 57, 6, 1027, "Nublado"},
@@ -62,7 +62,7 @@ void escribirDatosMeteorologicos(const string& nombreArchivo)
 void mostrarDatosPorFecha(const string& nombreArchivo)
 {
     int anio, mes, dia;
-    cout << "Digite alguna entre el rango 2020-01-01 hasta 2020-01-10 (en el formato AA MM DD): ";
+    cout << "Digite una fecha entre el rango 2020-01-01 hasta 2020-01-10 (en el formato AA MM DD): ";
     cin >> anio >> mes >> dia;
 
     ifstream archivoLectura(nombreArchivo, ios::binary);
@@ -108,3 +108,4 @@ int main()
 
 
 
+// Solo con una funcion que es que digite la fecha

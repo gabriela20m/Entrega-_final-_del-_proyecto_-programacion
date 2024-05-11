@@ -36,7 +36,7 @@ void registrarUsuario()
     cout << "Ingrese la contraseña: ";
     cin >> nuevoUsuario.contrasena;                                   // Obtener y copiar la contraseña ingresada por el usuario
 
-    ofstream archivoUsuarios("Usuarios.txt", ios::app);  // Abrir el archivo en modo escritura
+    ofstream archivoUsuarios("usuarios.bin", ios::binary | ios::app);  // Abrir el archivo en modo escritura binaria
 
     // Verificar si el archivo se abrió correctamente
     if (!archivoUsuarios)
@@ -46,19 +46,28 @@ void registrarUsuario()
     }
 
     // Escribir el nuevo usuario en el archivo 
-    archivoUsuarios << nuevoUsuario.usuario << " " << nuevoUsuario.contrasena << endl;
+    archivoUsuarios.write(reinterpret_cast<const char*>(&nuevoUsuario), sizeof(Persona));
     
     // Cerrar el archivo
     archivoUsuarios.close();
 
     // Mensaje de usuario registrado correctamente
     cout << "Usuario registrado correctamente." << endl;
+
+    // Preguntar si desea ver su correo
+    char opcion;
+    cout << "¿Desea ver su correo? (S/N): ";
+    cin >> opcion;
+    if (opcion == 'S' || opcion == 's')
+    {
+        cout << "Correo: " << nuevoUsuario.usuario << endl;
+    }
 }
 
 // Función para mostrar los usuarios registrados
 void verUsuariosRegistrados()
 {
-    ifstream archivoUsuarios("Usuarios.txt");     // Abrir el archivo en modo lectura
+    ifstream archivoUsuarios("usuarios.bin", ios::binary);     // Abrir el archivo en modo lectura binaria
 
     // Verificar si el archivo se abrió correctamente
     if (!archivoUsuarios)
@@ -70,7 +79,7 @@ void verUsuariosRegistrados()
     // Leer y mostrar todos los usuarios registrados
     cout << "Usuarios registrados:" << endl; 
     Persona usuarioLeido;
-    while (archivoUsuarios >> usuarioLeido.usuario >> usuarioLeido.contrasena) // Leer los usuarios almacenados en el archivo
+    while (archivoUsuarios.read(reinterpret_cast<char*>(&usuarioLeido), sizeof(Persona))) // Leer los usuarios almacenados en el archivo
     {
         cout << "Usuario: " << usuarioLeido.usuario << endl;
     }
@@ -89,7 +98,7 @@ void iniciarSesion()
     cout << "Ingrese la contraseña: ";
     cin >> contrasenaIngresada;                          // Obtener y copiar la contraseña ingresada por el usuario
 
-    ifstream archivoUsuarios("Usuarios.txt");   // Abrir el archivo en modo lectura
+    ifstream archivoUsuarios("usuarios.bin", ios::binary);   // Abrir el archivo en modo lectura binaria
 
     // Verificar si el archivo se abrió correctamente
     if (!archivoUsuarios)
@@ -101,7 +110,7 @@ void iniciarSesion()
     // Buscar el usuario en el archivo
     bool encontrado = false;
     Persona usuario;
-    while (archivoUsuarios >> usuario.usuario >> usuario.contrasena)
+    while (archivoUsuarios.read(reinterpret_cast<char*>(&usuario), sizeof(Persona)))
     {
         // Comparamos usuario y contraseña
         if (usuario.usuario == usuarioIngresado && usuario.contrasena == contrasenaIngresada)
@@ -115,6 +124,15 @@ void iniciarSesion()
     if (encontrado)
     {
         cout << "Inicio de sesión exitoso." << endl;  // Mostrar mensaje de inicio de sesión exitoso
+
+        // Preguntar si desea ver su correo
+        char opcion;
+        cout << "¿Desea ver su correo? (S/N): ";
+        cin >> opcion;
+        if (opcion == 'S' || opcion == 's')
+        {
+            cout << "Correo: " << usuarioIngresado << endl;
+        }
     }
     else
     {
