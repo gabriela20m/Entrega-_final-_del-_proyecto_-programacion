@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -16,13 +15,75 @@ struct DatosMeteorologicos
     int humedad;
     int velocidadViento;
     int presionAtmosferica;
-    char condicionMeteorologica[20]; // Tamaño suficiente para almacenar la condición meteorológica
+    string condicionMeteorologica;
 };
 
-// Función para escribir los datos meteorológicos en un archivo binario
-void escribirDatosMeteorologicos(const string& nombreArchivo)
+// Función para escribir los datos meteorológicos en un archivo de texto
+void escribirDatosMeteorologicos(const string& nombreArchivo, DatosMeteorologicos datos[], int numDatos)
 {
-    // Arreglo de datos meteorológicos proporcionados
+    // Abrir el archivo en modo escritura de texto, y posicionar el cursor al final para agregar nuevos datos
+    ofstream archivo(nombreArchivo, ios::out | ios::app);
+
+    // Verificar si el archivo se abrió correctamente
+    if (!archivo)
+    {
+        cerr << "Error al abrir el archivo." << endl;
+        return;
+    }
+
+    // Escribir los datos meteorológicos al final del archivo
+    for (int i = 0; i < numDatos; ++i)
+    {
+        archivo << datos[i].anio << " " << datos[i].mes << " " << datos[i].dia << " "
+                << fixed << setprecision(1) << datos[i].temperatura << " "
+                << datos[i].humedad << " " << datos[i].velocidadViento << " "
+                << datos[i].presionAtmosferica << " " << datos[i].condicionMeteorologica << endl;
+    }
+
+    // Cerrar el archivo
+    archivo.close();
+
+    // Mostrar mensaje de éxito
+    cout << "Datos meteorológicos escritos en el archivo de texto: " << nombreArchivo << endl;
+}
+
+// Función para solicitar y agregar un nuevo dato meteorológico
+void agregarNuevoDato(DatosMeteorologicos datos[], int& numDatos)
+{
+    // Solicitar al usuario que ingrese los nuevos datos meteorológicos
+    cout << "Ingrese la fecha (AA MM DD): ";
+    cin >> datos[numDatos].anio >> datos[numDatos].mes >> datos[numDatos].dia;
+    cout << "Ingrese la temperatura (C): ";
+    cin >> datos[numDatos].temperatura;
+    cout << "Ingrese la humedad (%): ";
+    cin >> datos[numDatos].humedad;
+    cout << "Ingrese la velocidad del viento (km/h): ";
+    cin >> datos[numDatos].velocidadViento;
+    cout << "Ingrese la presión atmosférica (hPa): ";
+    cin >> datos[numDatos].presionAtmosferica;
+    cout << "Ingrese la condición meteorológica: ";
+    cin.ignore(); // Para consumir el salto de línea residual del último cin
+    getline(cin, datos[numDatos].condicionMeteorologica);
+
+    // Incrementar el número de datos
+    numDatos++;
+}
+
+// Función para mostrar todos los datos meteorológicos almacenados
+void mostrarTodosLosDatos(DatosMeteorologicos datos[], int numDatos)
+{
+    cout << "Todos los datos meteorológicos:" << endl;
+    cout << setw(4) << "Año" << setw(4) << "Mes" << setw(4) << "Día" << setw(14) << "Temperatura" << setw(8) << "Humedad" << setw(20) << "Condición" << endl;
+    for (int i = 0; i < numDatos; ++i)
+    {
+        cout << setw(4) << datos[i].anio << setw(4) << datos[i].mes << setw(4) << datos[i].dia
+             << setw(14) << fixed << setprecision(1) << datos[i].temperatura << setw(8) << datos[i].humedad
+             << setw(20) << datos[i].condicionMeteorologica << endl;
+    }
+}
+
+int main()
+{
     DatosMeteorologicos datos[] = {
         {2020, 1, 1, 17.9, 74, 7, 1008, "Nublado"}, 
         {2020, 1, 2, 18.7, 64, 19, 1028, "Lluvioso"},
@@ -35,95 +96,8 @@ void escribirDatosMeteorologicos(const string& nombreArchivo)
         {2020, 1, 9, 22.1, 58, 9, 1019, "Lluvioso"},
         {2020, 1, 10, 19.5, 57, 20, 1017, "Nublado"}
     };
+    int numDatos = 10; // Número total de datos meteorológicos
 
-    // Abrir el archivo en modo escritura binaria
-    ofstream archivo(nombreArchivo, ios::out | ios::binary);
-
-    // Verificar si el archivo se abrió correctamente
-    if (!archivo)
-    {
-        cerr << "Error al abrir el archivo." << endl;
-        return;
-    }
-
-    // Escribir los datos meteorológicos en el archivo
-    for (const auto& dato : datos)
-    {
-        archivo.write(reinterpret_cast<const char*>(&dato), sizeof(DatosMeteorologicos));
-    }
-
-    // Cerrar el archivo
-    archivo.close();
-
-    // Mostrar mensaje de éxito
-    cout << "Datos meteorológicos escritos en el archivo binario: " << nombreArchivo << endl;
-}
-
-// Función para leer y mostrar los datos meteorológicos de una fecha específica
-void mostrarDatosPorFecha(const string& nombreArchivo)
-{
-    int anio, mes, dia;
-    cout << "Digite una fecha entre el rango 2020-01-01 hasta 2020-01-10 (en el formato AA MM DD): ";
-    cin >> anio >> mes >> dia;
-
-    ifstream archivoLectura(nombreArchivo, ios::binary);
-    if (!archivoLectura)
-    {
-        cerr << "Error al abrir el archivo para lectura." << endl;
-        return;
-    }
-
-    DatosMeteorologicos datoLeido;
-    bool encontrado = false;
-
-    // Leer y buscar los datos correspondientes a la fecha ingresada
-    while (archivoLectura.read(reinterpret_cast<char*>(&datoLeido), sizeof(DatosMeteorologicos)))
-    {
-        if (datoLeido.anio == anio && datoLeido.mes == mes && datoLeido.dia == dia)
-        {
-            encontrado = true;
-            cout << "Datos meteorológicos para la fecha " << anio << "-" << mes << "-" << dia << ":" << endl;
-            cout << "Temperatura (C): " << datoLeido.temperatura << endl;
-            cout << "Humedad (%): " << datoLeido.humedad << endl;
-            cout << "Velocidad del Viento (km/h): " << datoLeido.velocidadViento << endl;
-            cout << "Presión Atmosférica (hPa): " << datoLeido.presionAtmosferica << endl;
-            cout << "Condición Meteorológica: " << datoLeido.condicionMeteorologica << endl;
-            break;
-        }
-    }
-
-    if (!encontrado)
-    {
-        cout << "No se encontraron datos para la fecha ingresada." << endl;
-    }
-
-    archivoLectura.close();
-}
-
-// Función para mostrar todos los datos meteorológicos almacenados en el archivo
-void mostrarTodosLosDatos(const string& nombreArchivo)
-{
-    ifstream archivoLectura(nombreArchivo, ios::binary);
-    if (!archivoLectura)
-    {
-        cerr << "Error al abrir el archivo para lectura." << endl;
-        return;
-    }
-
-    DatosMeteorologicos datoLeido;
-
-    cout << "Todos los datos meteorológicos:" << endl;
-    cout << setw(4) << "Año" << setw(4) << "Mes" << setw(4) << "Día" << setw(10) << "Temperatura" << setw(8) << "Humedad" << setw(20) << "Condición" << endl;
-    while (archivoLectura.read(reinterpret_cast<char*>(&datoLeido), sizeof(DatosMeteorologicos)))
-    {
-        cout << setw(4) << datoLeido.anio << setw(4) << datoLeido.mes << setw(4) << datoLeido.dia << setw(10) << datoLeido.temperatura << setw(8) << datoLeido.humedad << setw(20) << datoLeido.condicionMeteorologica << endl;
-    }
-
-    archivoLectura.close();
-}
-
-int main()
-{
     int opcion;
 
     do
@@ -139,13 +113,15 @@ int main()
         switch (opcion)
         {
             case 1:
-                escribirDatosMeteorologicos("datos.bin");
+                agregarNuevoDato(datos, numDatos);
+                escribirDatosMeteorologicos("datos.txt", datos, numDatos);
                 break;
             case 2:
-                mostrarTodosLosDatos("datos.bin");
+                mostrarTodosLosDatos(datos, numDatos);
                 break;
             case 3:
-                mostrarDatosPorFecha("datos.bin");
+                // Aquí puedes implementar la función para buscar por fecha si lo deseas
+                cout << "Función de búsqueda no implementada todavía." << endl;
                 break;
             case 4:
                 cout << "Saliendo..." << endl;
@@ -158,6 +134,8 @@ int main()
 
     return 0;
 }
+
+
 
 
 
