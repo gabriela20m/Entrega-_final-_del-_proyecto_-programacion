@@ -1059,7 +1059,7 @@ void encontrarMaximaMinimaTemperatura(const string& nombreArchivo)
 {
     int anio1, mes1, dia1;
     int anio2, mes2, dia2;
-
+    
     cout << "Digite la primera fecha (en el formato AAAA MM DD): ";
     cin >> anio1 >> mes1 >> dia1;
 
@@ -1251,13 +1251,20 @@ void calcularPromedioTemperatura(const string& nombreArchivo)
 }
 
 // Función para calcular el promedio de humedad en relación con una condición meteorológica dada
-void calcularPromedioHumedad(const string& nombreArchivo)
+void calcularMayorPromedioHumedad(const string& nombreArchivo)
 {
-    string condicion;                                 // Aqui se calcula el promedio de humedad teniendo encuenta el total de humedad
-                                                    // y el contador que son los dias por dodne recorre ese contador
+    int anio, mes; // Declara variables para almacenar el año y el mes.
+    string condicion; // Declara una variable para almacenar la condición meteorológica.
+
+    // Solicitar al usuario que ingrese el mes y el año en el formato AAAA MM.
+    cout << "Digite el año y el mes (en el formato AAAA MM): ";
+    cin >> anio >> mes;
+
+    // Solicitar al usuario que ingrese la condición meteorológica.
     cout << "Digite la condición meteorológica: ";
     cin >> condicion;
 
+    // Abrir el archivo para lectura.
     ifstream archivoLectura(nombreArchivo);
     if (!archivoLectura)
     {
@@ -1265,33 +1272,129 @@ void calcularPromedioHumedad(const string& nombreArchivo)
         return;
     }
 
-    DatosMeteorologicos datoLeido;
-    int contador = 0;
-    float sumaHumedad = 0;
+    DatosMeteorologicos datoLeido; // Declara una variable para almacenar los datos leídos.
+    int contador = 0; // Inicializa un contador de días.
+    int sumaHumedad = 0; // Inicializa la suma de humedad.
+    int mayorHumedad = 0; // Inicializa la mayor humedad encontrada.
+    string condicionMayorHumedad; // Almacena la condición asociada a la mayor humedad.
 
+    // Leer los datos del archivo
     while (archivoLectura >> datoLeido.anio >> datoLeido.mes >> datoLeido.dia
                           >> datoLeido.temperatura >> datoLeido.humedad >> datoLeido.velocidadViento
                           >> datoLeido.presionAtmosferica >> datoLeido.condicionMeteorologica)
     {
-        if (datoLeido.condicionMeteorologica == condicion)
+        // Verificar si el año y el mes coinciden con los ingresados por el usuario.
+        if (datoLeido.anio == anio && datoLeido.mes == mes)
         {
-            sumaHumedad += datoLeido.humedad;
-            contador++;
+            // Verificar si la condición meteorológica coincide con la ingresada por el usuario.
+            if (datoLeido.condicionMeteorologica == condicion)
+            {
+                sumaHumedad += datoLeido.humedad; // Sumar la humedad.
+                contador++; // Incrementar el contador de días.
+            }
+            // Verificar si se encuentra una mayor humedad.
+            if (datoLeido.humedad > mayorHumedad)
+            {
+                mayorHumedad = datoLeido.humedad; // Actualizar la mayor humedad.
+                condicionMayorHumedad = datoLeido.condicionMeteorologica; // Actualizar la condición asociada.
+            }
         }
     }
 
+    archivoLectura.close(); // Cerrar el archivo.
+
+    // Calcular el promedio de humedad y mostrar los resultados.
+    if (contador > 0) // Verificar si se encontraron datos.
+    {
+        // Calcular el promedio de humedad.
+        float promedio = sumaHumedad / float(contador); // Usando float() para asegurar la división decimal.
+        // Mostrar el promedio de humedad.
+        cout << "El promedio de humedad para la condición meteorológica " << condicion
+             << " en el mes " << mes << " del año " << anio << " es: " << promedio << "%" << endl;
+    }
+    else // Si no se encontraron datos.
+    {
+        // Mostrar un mensaje de que no se encontraron datos.
+        cout << "No hay datos para la condición meteorológica " << condicion
+             << " en el mes " << mes << " del año " << anio << "." << endl;
+    }
+
+    // Mostrar la mayor humedad y la condición meteorológica asociada.
+    cout << "La mayor humedad en el mes " << mes << " del año " << anio
+         << " es " << mayorHumedad << "%, presentada con la condición meteorológica: " << condicionMayorHumedad << endl;
+}
+
+// Función para encontrar el menor porcentaje de humedad para una condición meteorológica dada
+void calcularMenorPromedioHumedad(const string& nombreArchivo)
+{
+    // Solicitar la condición meteorológica, el mes y el año al usuario
+    string condicion;
+    int mes, anio;
+
+    cout << "Digite la condición meteorológica: ";
+    cin >> condicion;
+
+    cout << "Digite el mes y el año (en el formato AAAA MM): ";
+    cin >> anio >> mes;
+
+    // Abrir el archivo para lectura
+    ifstream archivoLectura(nombreArchivo);
+    if (!archivoLectura)
+    {
+        cerr << "Error al abrir el archivo para lectura." << endl;
+        return;
+    }
+
+    // Declarar variables para el cálculo del promedio y el contador
+    DatosMeteorologicos datoLeido;
+    int contador = 0;
+    float sumaHumedad = 0;
+    float menorPromedio = 100.0; // Inicializamos con un valor alto
+
+    // Leer el archivo línea por línea
+    while (archivoLectura >> datoLeido.anio >> datoLeido.mes >> datoLeido.dia
+                          >> datoLeido.temperatura >> datoLeido.humedad >> datoLeido.velocidadViento
+                          >> datoLeido.presionAtmosferica >> datoLeido.condicionMeteorologica)
+    {
+        // Verificar si los datos corresponden al mes y año especificados
+        if (datoLeido.anio == anio && datoLeido.mes == mes)
+        {
+            // Verificar si la condición meteorológica es la especificada por el usuario
+            if (datoLeido.condicionMeteorologica == condicion)
+            {
+                // Sumar la humedad y aumentar el contador
+                sumaHumedad += datoLeido.humedad;
+                contador++;
+            }
+        }
+    }
+
+    // Cerrar el archivo después de leer todos los datos
     archivoLectura.close();
 
+    // Comprobar si se encontraron datos de humedad para la condición y el período de tiempo especificados
     if (contador == 0)
     {
-        cout << "No hay datos de humedad para la condición meteorológica ingresada." << endl;
+        cout << "No hay datos de humedad para la condición meteorológica ingresada en el mes y año especificados." << endl;
     }
     else
     {
+        // Calcular el promedio de humedad
         float promedio = sumaHumedad / contador;
-        cout << "El promedio de humedad para la condición meteorológica " << condicion << " es: " << promedio << "%" << endl;
+
+        // Comprobar si el promedio es menor que el menor promedio encontrado hasta ahora
+        if (promedio < menorPromedio)
+        {
+            // Actualizar el menor promedio si es menor que el actual
+            menorPromedio = promedio;
+        }
+
+        // Mostrar el menor promedio de humedad encontrado
+        cout << "El menor promedio de humedad para la condición meteorológica " << condicion << " en el mes " << mes << "/" << anio << " es: " << menorPromedio << "%" << endl;
     }
 }
+
+
 
 int main()
 {
@@ -1311,8 +1414,9 @@ int main()
         cout << "2. Agregar nuevo dato meteorológico" << endl;
         cout << "3. Ver máxima y mínima temperatura en un rango específico" << endl;
         cout << "4. Calcular promedio de temperatura durante un mes determinado" << endl;
-        cout << "5. Calcular promedio de humedad en relación con una condición meteorológica dada" << endl;
-        cout << "6. Salir" << endl;
+        cout << "5. Calcular el porcentaje mayor de humedad en relación con una condición meteorológica dada" << endl;
+        cout<<  "6. Calcular el porcentaje menor de humedad en relacion con una condicion meteorologica dada"<<endl;
+        cout << "7. Salir" << endl;
 
         // Selección de opción
         cout << "Seleccione una opción: ";
@@ -1334,16 +1438,16 @@ int main()
                 calcularPromedioTemperatura(nombreArchivo); // Llma a la funcion para hallar el promedio de temperatura
                 break;
             case 5:
-                calcularPromedioHumedad(nombreArchivo); // Llama a la funcion para hallar el promedio de humedad
+                calcularMayorPromedioHumedad(nombreArchivo); // Llama a la funcion para hallar el mayor porcentaje de humedad en relacion a una condicion meteorologica
                 break;
             case 6:
-                cout << "Saliendo del programa..." << endl;
+              calcularMenorPromedioHumedad(nombreArchivo); // Lama a la funcion de calculra el menor porcentaje de humedad con relacion a una condicion meteorologica dada
                 break;
             default:
                 cout << "Opción no válida. Inténtelo de nuevo." << endl;
                 break;
         }
-    } while (opcion != 6);
+    } while (opcion != 7);
 
     return 0;
 }

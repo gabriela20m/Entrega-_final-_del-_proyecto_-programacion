@@ -54,14 +54,6 @@ void registrarUsuario()
     // Mensaje de usuario registrado correctamente
     cout << "Usuario registrado correctamente." << endl;
 
-    // Preguntar si desea ver su correo
-    char opcion;
-    cout << "¿Desea ver su correo? (S/N): ";
-    cin >> opcion;
-    if (opcion == 'S' || opcion == 's')
-    {
-        cout << "Correo: " << nuevoUsuario.usuario << endl;
-    }
 }
 
 // Función para mostrar los usuarios registrados
