@@ -1,46 +1,40 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
 // Definición de la estructura Persona
-struct Persona 
-{
-    string usuario;       // Nombre de usuario (asumido como correo electrónico)
+struct Persona {
+    string usuario;       // Nombre de usuario (Entendido como correo electrónico)
     string contrasena;    // Contraseña
 };
 
 // Función para mostrar el menú y obtener la opción del usuario
-int menu()
-{
+int menu() {
     int opcion = 0;
-
     cout << "\n--- Menú ---" << endl;
     cout << "1. Iniciar sesión" << endl;           // Mostrar opción para iniciar sesión
     cout << "2. Registrar usuario" << endl;        // Mostrar opción para registrar un nuevo usuario
-    cout << "3. Ver usuarios registrados" << endl; // Mostrar opción para ver usuarios registrados
-    cout << "4. Salir" << endl;                     // Mostrar opción para salir
+    cout << "3. Salir" << endl;                     // Mostrar opción para salir
     cout << "Opción: ";                             // Pedir al usuario que ingrese una opción
-    cin >> opcion;                                       // Leer la opción ingresada por el usuario
-
-    return opcion;                                       // Devolver la opción ingresada por el usuario
+    cin >> opcion;                                   // Leer la opción ingresada por el usuario
+    cin.ignore();                                    // Limpiar el búfer de entrada
+    return opcion;                                   // Devolver la opción ingresada por el usuario
 }
 
 // Función para registrar un nuevo usuario
-void registrarUsuario()
-{
+void registrarUsuario() {
     Persona nuevoUsuario;                                             // Crear una nueva Persona
     cout << "Ingrese el nombre de usuario: ";
     cin >> nuevoUsuario.usuario;                                      // Obtener y copiar el nombre de usuario ingresado por el usuario
     cout << "Ingrese la contraseña: ";
     cin >> nuevoUsuario.contrasena;                                   // Obtener y copiar la contraseña ingresada por el usuario
-
-    ofstream archivoUsuarios("usuarios.bin", ios::binary | ios::app);  // Abrir el archivo en modo escritura binaria
+    ofstream archivoUsuarios("usuarios.bin", ios::binary | ios::app); // Abrir el archivo en modo escritura binaria
 
     // Verificar si el archivo se abrió correctamente
-    if (!archivoUsuarios)
-    {
+    if (!archivoUsuarios) {
         cout << "Error al abrir el archivo." << endl;  // Mostrar mensaje de error si no se pudo abrir el archivo
         return;
     }
@@ -55,34 +49,8 @@ void registrarUsuario()
     cout << "Usuario registrado correctamente." << endl;
 }
 
-// Función para mostrar los usuarios registrados
-void verUsuariosRegistrados()
-{
-    ifstream archivoUsuarios("usuarios.bin", ios::binary);     // Abrir el archivo en modo lectura binaria
-
-    // Verificar si el archivo se abrió correctamente
-    if (!archivoUsuarios)
-    {
-        cout << "Error al abrir el archivo." << endl;  // Mostrar mensaje de error si no se pudo abrir el archivo
-        return;
-    }
-
-    // Leer y mostrar todos los usuarios registrados
-    cout << "Usuarios registrados:" << endl; 
-    Persona usuarioLeido;
-    while (archivoUsuarios.read(reinterpret_cast<char*>(&usuarioLeido), sizeof(Persona))) // Leer los usuarios almacenados en el archivo
-    {
-        cout << "Usuario: " << usuarioLeido.usuario << endl;
-        // Ignoramos la contraseña
-    }
-
-    // Cerrar el archivo
-    archivoUsuarios.close();
-}
-
 // Función para iniciar sesión
-void iniciarSesion()
-{
+void iniciarSesion() {
     string usuarioIngresado;                             // Almacenar el nombre de usuario ingresado por el usuario
     string contrasenaIngresada;                          // Almacenar la contraseña ingresada por el usuario
     cout << "Ingrese el nombre de usuario: ";
@@ -93,54 +61,52 @@ void iniciarSesion()
     ifstream archivoUsuarios("usuarios.bin", ios::binary);   // Abrir el archivo en modo lectura binaria
 
     // Verificar si el archivo se abrió correctamente
-    if (!archivoUsuarios)
-    {
+    if (!archivoUsuarios) {
         cout << "Error al abrir el archivo." << endl;  // Mostrar mensaje de error si no se pudo abrir el archivo
         return;
     }
 
-    // Buscar el usuario en el archivo
-    bool encontrado = false;
+    // Almacenar todos los usuarios
+    vector<Persona> usuarios;
     Persona usuario;
-    while (archivoUsuarios.read(reinterpret_cast<char*>(&usuario), sizeof(Persona)))
-    {
-        // Comparamos usuario y contraseña
-        if (usuario.usuario == usuarioIngresado && usuario.contrasena == contrasenaIngresada)
-        {
+    while (archivoUsuarios.read(reinterpret_cast<char*>(&usuario), sizeof(Persona))) {
+        usuarios.push_back(usuario);
+    }
+
+    // Buscar el usuario en el vector
+    bool encontrado = false;
+    for (const auto& usr : usuarios) {
+        // Comparamos solo el nombre de usuario
+        if (usr.usuario == usuarioIngresado && usr.contrasena == contrasenaIngresada) {
             encontrado = true;
+            cout << "Inicio de sesión exitoso." << endl;  // Mostrar mensaje de inicio de sesión exitoso
+            // Preguntar si desea ver su correo
+            char opcion;
+            cout << "¿Desea ver su correo? (S/N): ";
+            cin >> opcion;
+            if (opcion == 'S' || opcion == 's') {
+                cout << "Correo: " << usuarioIngresado << endl;
+            }
             break;
         }
     }
 
-    // Mostrar el resultado de la búsqueda
-    if (encontrado)
-    {
-        cout << "Inicio de sesión exitoso." << endl;  // Mostrar mensaje de inicio de sesión exitoso
-
-        // Preguntar si desea ver su correo
-        char opcion;
-        cout << "¿Desea ver su correo? (S/N): ";
-        cin >> opcion;
-        if (opcion == 'S' || opcion == 's')
-        {
-            cout << "Correo: " << usuarioIngresado << endl;
-        }
-    }
-    else
-    {
+    // Verificar si el usuario no fue encontrado
+    if (!encontrado) {
         cout << "Usuario o contraseña incorrectos." << endl;  // Mostrar mensaje de usuario o contraseña incorrectos
     }
 
     // Cerrar el archivo
     archivoUsuarios.close();
+
+    // Mostrar el menú nuevamente
+    menu();
 }
 
 // Función principal
-int main()
-{
+int main() {
     int opcionSeleccionada = 0;
-    do
-    {
+    do {
         opcionSeleccionada = menu();  // Mostrar el menú y obtener la opción del usuario
         switch (opcionSeleccionada)   // Evaluar la opción del usuario
         {
@@ -150,13 +116,10 @@ int main()
             case 2:
                 registrarUsuario();     // Registrar un nuevo usuario
                 break;
-            case 3:
-                verUsuariosRegistrados(); // Ver usuarios registrados
-                break;
             default:
                 break;
         }
-    } while (opcionSeleccionada != 4);  // Repetir hasta que el usuario elija salir
+    } while (opcionSeleccionada != 3);  // Repetir hasta que el usuario elija salir
     
     return 0;
 }

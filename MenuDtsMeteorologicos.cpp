@@ -1405,7 +1405,7 @@ int main()
 
     // Opción del menú
     int opcion;
-
+ 
     do
     {
         // Menú principal}
