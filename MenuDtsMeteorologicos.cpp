@@ -1426,22 +1426,22 @@ int main()
         switch (opcion)
         {
             case 1:
-                mostrarDatosPorRango(nombreArchivo); // llama a la funcio para bsucar datos de un rango de fecha
+                mostrarDatosPorRango(nombreArchivo); // llama a la funcion para buscar datos de un rango de fecha
                 break;
             case 2:
                 agregarDatosMeteorologicos(nombreArchivo); // Llama a la funcion para agregar nuevos datos en la base de dats
                 break;
             case 3:
-                encontrarMaximaMinimaTemperatura(nombreArchivo); // LLama a la funcio par hallar la Max y min de temperatura
+                encontrarMaximaMinimaTemperatura(nombreArchivo); // LLama a la funcion par hallar la Max y min temperatura
                 break;
             case 4:
-                calcularPromedioTemperatura(nombreArchivo); // Llma a la funcion para hallar el promedio de temperatura
+                calcularPromedioTemperatura(nombreArchivo); // Llama a la funcion para hallar el promedio de temperatura
                 break;
             case 5:
                 calcularMayorPromedioHumedad(nombreArchivo); // Llama a la funcion para hallar el mayor porcentaje de humedad en relacion a una condicion meteorologica
                 break;
             case 6:
-              calcularMenorPromedioHumedad(nombreArchivo); // Lama a la funcion de calculra el menor porcentaje de humedad con relacion a una condicion meteorologica dada
+              calcularMenorPromedioHumedad(nombreArchivo); // Llama a la funcion de calculra el menor porcentaje de humedad con relacion a una condicion meteorologica dada
                 break;
             default:
                 cout << "Opción no válida. Inténtelo de nuevo." << endl;
@@ -1453,7 +1453,7 @@ int main()
 }
 
 
-//Codigo del menu de los datos meteriologicos dodeen calcula la maxima minima temperatura 
+//Progrma del codi
 // El prpmedio de temperatura y de humedad con una condicion meteorologica 
 // Funcional con los condicionales por ahora solo hasta el 4 :)
         
