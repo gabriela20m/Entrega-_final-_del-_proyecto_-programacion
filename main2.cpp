@@ -133,17 +133,16 @@ void encontrarMaximaMinimaTemperatura(const DatosMeteorologicos datos[], int num
 
 // Función para calcular el promedio de temperatura para un mes específico
 void calcularPromedioTemperaturaPorMes(const DatosMeteorologicos datos[], int numDatos) {
-    int mes, anio;
-    cout << "Ingrese el número de mes y año para calcular el promedio de temperatura (en el formato MM AAAA): ";
-    cin >> mes >> anio;
+    int mes;
+    encontrarRangos(mes, mes, mes, mes, mes, mes); // Solicitar solo el mes
 
     float totalTemperaturas = 0;
     int cantidadDias = 0;
     bool encontrado = false;
 
-    // Calcular el promedio de temperaturas para el mes y año especificados
+    // Calcular el promedio de temperaturas para el mes especificado
     for (int i = 0; i < numDatos; ++i) {
-        if (datos[i].mes == mes && datos[i].anio == anio) {
+        if (datos[i].mes == mes) {
             totalTemperaturas += datos[i].temperatura;
             cantidadDias++;
             encontrado = true;
@@ -151,22 +150,23 @@ void calcularPromedioTemperaturaPorMes(const DatosMeteorologicos datos[], int nu
     }
 
     if (!encontrado) {
-        cout << "No hay datos para el mes y año especificados." << endl;
+        cout << "No hay datos para el mes especificado." << endl;
         return;
     }
 
     float promedio = totalTemperaturas / cantidadDias;
-    cout << "El promedio de temperatura para el mes " << mes << "/" << anio << " es: " << fixed
+    cout << "El promedio de temperatura para el mes " << mes << " es: " << fixed
         << setprecision(2) << promedio << " C" << endl;
 }
 
 // Función para calcular el mayor promedio de humedad en relación a una
 // condición meteorológica
 void calcularMayorPromedioHumedad(const DatosMeteorologicos datos[], int numDatos) {
+    int anio1, mes1, dia1;
+    int anio2, mes2, dia2;
+    encontrarRangos(anio1, mes1, dia1, anio2, mes2, dia2);
+
     string condicion;
-    int mes, anio;
-    cout << "Ingrese mes y año para evaluar: ";
-    cin >> mes >> anio;
     cout << "Ingrese la condición meteorológica para calcular el promedio de humedad: ";
     cin >> condicion;
 
@@ -176,9 +176,11 @@ void calcularMayorPromedioHumedad(const DatosMeteorologicos datos[], int numDato
     float mayorPromedio = -1.0; // Inicializar con un valor muy bajo
 
     // Calcular el mayor promedio de humedad para la condición meteorológica
-    // especificada en el mes y año especificados
+    // especificada
     for (int i = 0; i < numDatos; ++i) {
-        if (datos[i].mes == mes && datos[i].anio == anio &&
+        if (datos[i].anio >= anio1 && datos[i].mes >= mes1 &&
+            datos[i].dia >= dia1 && datos[i].anio <= anio2 &&
+            datos[i].mes <= mes2 && datos[i].dia <= dia2 &&
             datos[i].condicionMeteorologica == condicion) {
             totalHumedad += datos[i].humedad;
             cantidadMediciones++;
@@ -187,7 +189,7 @@ void calcularMayorPromedioHumedad(const DatosMeteorologicos datos[], int numDato
     }
 
     if (!encontrado) {
-        cout << "No hay datos para la condición meteorológica y fecha especificados." << endl;
+        cout << "No hay datos para la condición meteorológica especificada en el rango de fechas." << endl;
         return;
     }
 
@@ -196,7 +198,7 @@ void calcularMayorPromedioHumedad(const DatosMeteorologicos datos[], int numDato
         mayorPromedio = promedio;
 
     cout << "El mayor promedio de humedad para la condición " << condicion
-        << " en el mes " << mes << "/" << anio << " es: " << fixed << setprecision(2) << mayorPromedio << " %" << endl;
+        << " es: " << fixed << setprecision(2) << mayorPromedio << " %" << endl;
 }
 
 // Función para calcular el menor promedio de humedad en relación a una
@@ -210,8 +212,7 @@ void calcularMenorPromedioHumedad(const string& nombreArchivo)
     cout << "Digite la condición meteorológica: ";
     cin >> condicion;
 
-    cout << "Digite el mes y el año (en el formato MM AAAA): ";
-    cin >> mes >> anio;
+    encontrarRangos(anio, mes, mes, mes, mes, mes); // Solicitar solo el mes y el año
 
     // Abrir el archivo para lectura
     ifstream archivoLectura(nombreArchivo);
@@ -233,7 +234,7 @@ void calcularMenorPromedioHumedad(const string& nombreArchivo)
                           >> datoLeido.presionAtmosferica >> datoLeido.condicionMeteorologica)
     {
         // Verificar si los datos corresponden al mes y año especificados
-        if (datoLeido.mes == mes && datoLeido.anio == anio)
+        if (datoLeido.anio == anio && datoLeido.mes == mes)
         {
             // Verificar si la condición meteorológica es la especificada por el usuario
             if (datoLeido.condicionMeteorologica == condicion)
@@ -340,7 +341,7 @@ int main() {
                 calcularMayorPromedioHumedad(datos, numDatos);
                 break;
             case 5:
-                calcularMenorPromedioHumedad("datos_meteorologicos.txt");
+                calcularMenorPromedioHumedad("datos_meteorologicos.txt"); // Pasar el nombre del archivo
                 break;
             case 0:
                 cout << "Saliendo del programa..." << endl;
@@ -352,7 +353,3 @@ int main() {
 
     return 0;
 }
-
-
-
-
