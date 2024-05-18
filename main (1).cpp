@@ -1,3 +1,4 @@
+#include <cctype>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -89,7 +90,9 @@ void agregarDatosMeteorologicos(DatosMeteorologicos datos[], int &numDatos) {
     return;
   }
 
-  cout << "Ingrese los datos meteorológicos (Formato: AAAA-MM-DD Temp Humedad Velocidad Presión Condición):" << endl;
+  cout << "Ingrese los datos meteorológicos (Formato: AAAA-MM-DD Temp Humedad "
+          "Velocidad Presión Condición):"
+       << endl;
   cout << "Ejemplo: 2023-05-16 25.6 70 5 1013 Soleado" << endl;
 
   string fecha;
@@ -142,23 +145,48 @@ void encontrarRangos(int &anio1, int &mes1, int &dia1, int &anio2, int &mes2,
   cin >> anio2 >> mes2 >> dia2;
 }
 
-// Función para encontrar temperatura máxima y mínima en un rango de fechas
-void encontrarMaximaMinimaTemperatura(const DatosMeteorologicos datos[],
+// Función para encontrar temperatura máxima en un rango de fechas
+void encontrarMaximaTemperatura(const DatosMeteorologicos datos[],
                                       int numDatos) {
 
   encontrarRangos(anio1, mes1, dia1, anio2, mes2, dia2);
 
   float tempMax = -9999.0;
+  bool encontrada = false;
+
+  for (int i = 0; i < numDatos; ++i) {
+    if (datos[i].anio >= anio1 && datos[i].anio <= anio2 &&
+        datos[i].mes >= mes1 && datos[i].mes <= mes2 && datos[i].dia >= dia1 &&
+        datos[i].dia <= dia2) {
+      if (datos[i].temperatura > tempMax) {
+        tempMax = datos[i].temperatura;
+      }
+      
+      encontrada = true;
+    }
+  }
+
+  if (encontrada) {
+    cout << "La temperatura máxima en el rango de fechas especificado es: "
+         << tempMax << " C°." << endl;
+  } else {
+    cout << "No hay datos para el rango de fechas especificado." << endl;
+  }
+}
+
+// Función para encontrar temperatura  mínima en un rango de fechas
+void encontrarMinimaTemperatura(const DatosMeteorologicos datos[],
+                                      int numDatos) {
+
+  encontrarRangos(anio1, mes1, dia1, anio2, mes2, dia2);
+
   float tempMin = 9999.0;
   bool encontrada = false;
 
   for (int i = 0; i < numDatos; ++i) {
     if (datos[i].anio >= anio1 && datos[i].anio <= anio2 &&
-        datos[i].mes >= mes1 && datos[i].mes <= mes2 &&
-        datos[i].dia >= dia1 && datos[i].dia <= dia2) {
-      if (datos[i].temperatura > tempMax) {
-        tempMax = datos[i].temperatura;
-      }
+        datos[i].mes >= mes1 && datos[i].mes <= mes2 && datos[i].dia >= dia1 &&
+        datos[i].dia <= dia2) {
       if (datos[i].temperatura < tempMin) {
         tempMin = datos[i].temperatura;
       }
@@ -167,17 +195,16 @@ void encontrarMaximaMinimaTemperatura(const DatosMeteorologicos datos[],
   }
 
   if (encontrada) {
-    cout << "La temperatura máxima en el rango de fechas especificado es: "
-         << tempMax << " grados Celsius." << endl;
     cout << "La temperatura mínima en el rango de fechas especificado es: "
-         << tempMin << " grados Celsius." << endl;
+         << tempMin << " C°." << endl;
   } else {
     cout << "No hay datos para el rango de fechas especificado." << endl;
   }
 }
 
 // Función para calcular el promedio de la temperatura en un mes especificado
-void calcularPromedioTemperaturaMes(const DatosMeteorologicos datos[], int numDatos) {
+void calcularPromedioTemperaturaMes(const DatosMeteorologicos datos[],
+                                    int numDatos) {
   int mes, anio;
   cout << "Ingrese el mes y año (Formato MM AAAA): ";
   cin >> mes >> anio;
@@ -197,8 +224,7 @@ void calcularPromedioTemperaturaMes(const DatosMeteorologicos datos[], int numDa
   if (encontrada) {
     float promedio = totalTemperatura / cantidadMediciones;
     cout << "El promedio de la temperatura en el mes " << mes << "/" << anio
-         << " es: " << fixed << setprecision(2) << promedio << " grados Celsius."
-         << endl;
+         << " es: " << fixed << setprecision(2) << promedio << " C°." << endl;
   } else {
     cout << "No hay datos para el mes y año especificados." << endl;
   }
@@ -255,7 +281,7 @@ void calcularMenorPromedioHumedad(const DatosMeteorologicos datos[],
   cin >> condicion;
 
   int mes, anio;
-  cout << "Ingrese el mes y año (Formato MM AAAA): ";
+  cout << "Ingrese el mes y año (Formato MM AAAA) Ejemplo : ";
   cin >> mes >> anio;
 
   int totalHumedad = 0;
@@ -298,8 +324,8 @@ void mostrarDatosMeteorologicosPorRango(const DatosMeteorologicos datos[],
   cout << "Datos meteorológicos en el rango de fechas especificado:" << endl;
   for (int i = 0; i < numDatos; ++i) {
     if (datos[i].anio >= anio1 && datos[i].anio <= anio2 &&
-        datos[i].mes >= mes1 && datos[i].mes <= mes2 &&
-        datos[i].dia >= dia1 && datos[i].dia <= dia2) {
+        datos[i].mes >= mes1 && datos[i].mes <= mes2 && datos[i].dia >= dia1 &&
+        datos[i].dia <= dia2) {
       cout << "Año: " << datos[i].anio << ", Mes: " << datos[i].mes
            << ", Día: " << datos[i].dia
            << ", Temperatura: " << datos[i].temperatura
@@ -317,64 +343,142 @@ void mostrarDatosMeteorologicosPorRango(const DatosMeteorologicos datos[],
   }
 }
 
-int main() {
-    DatosMeteorologicos datos[MAX_DATOS];
-    int numDatos = 0;
+bool continuarPrograma() {
+  char respuesta;
+  while (true) {
+    cout << "¿Desea seguir operando? (s/n): ";
+    cin >> respuesta;
+    respuesta = tolower(respuesta); // Convertir a minúscula para hacer la
+                                    // comparación y evitar errores
 
-    string nombreArchivo = "datos_meteorologicos.txt";
-
-    if (leerDatosMeteorologicos(nombreArchivo, datos, numDatos) != 0) {
-        return 1;
+    if (respuesta == 's') {
+      return true;
+    } else if (respuesta == 'n') {
+      return false;
+      break;
+    } else {
+      cout << "Respuesta no válida. Por favor, responda 's' para sí o 'n' para "
+              "no."
+           << endl;
     }
-
-    int opcion;
-    do {
-        // Menú de opciones
-        cout << "Menú:" << endl;
-        cout << "1. Mostrar datos meteorológicos" << endl;
-        cout << "2. Encontrar temperatura máxima y mínima en un rango de fechas" << endl;
-        cout << "3. Calcular promedio de temperatura en un mes especificado" << endl;
-        cout << "4. Calcular mayor promedio de humedad con relacion a una condicion meteorologica" << endl;
-        cout << "5. Calcular menor promedio de humedad con relacion a una condicion meteorologica" << endl;
-        cout << "6. Mostrar datos meteorológicos por rango de fechas" << endl;
-        cout << "7. Agregar datos meteorológicos" << endl;
-        cout << "8. Salir" << endl;
-        cout << "Ingrese su opción: ";
-        cin >> opcion;
-
-        switch (opcion) {
-            case 1:
-                imprimirDatosMeteorologicos(datos, numDatos);
-                break;
-            case 2:
-                encontrarMaximaMinimaTemperatura(datos, numDatos);
-                break;
-            case 3:
-                calcularPromedioTemperaturaMes(datos, numDatos);
-                break;
-            case 4:
-                calcularMayorPromedioHumedad(datos, numDatos);
-                break;
-            case 5:
-                calcularMenorPromedioHumedad(datos, numDatos);
-                break;
-            case 6:
-                mostrarDatosMeteorologicosPorRango(datos, numDatos);
-                break;
-            case 7:
-                agregarDatosMeteorologicos(datos, numDatos);
-                break;
-            case 8:
-                cout << "Saliendo..." << endl;
-                break;
-            default:
-                cout << "Opción no válida. Inténtelo de nuevo." << endl;
-                break;
-        }
-
-    } while (opcion != 8);
-
-    return 0;
+  }
 }
 
+int main() {
+  DatosMeteorologicos datos[MAX_DATOS];
+  int numDatos = 0;
 
+  string nombreArchivo = "datos_meteorologicos.txt";
+
+  if (leerDatosMeteorologicos(nombreArchivo, datos, numDatos) != 0) {
+    return 1;
+  }
+
+  int opcion;
+  do {
+
+    cout << "|-----------------------------------------------------------------"
+            "----------|"
+         << endl;
+    cout << " ------------------------MENU DATOS "
+            "METEOROLOGICOS----------------------------"
+         << endl;
+    cout << "|-----------------------------------------------------------------"
+            "----------|"
+         << endl;
+
+    cout << "1. Mostrar datos meteorológicos" << endl;
+    cout << "__________________________________________________________________"
+            "______________"
+         << endl;
+    cout << "2. Encontrar temperatura máxima en un rango de fechas"
+         << endl;
+    cout << "__________________________________________________________________"
+        "______________"
+     << endl;
+    cout << "3. Encontrar temperatura mínima en un rango de fechas"
+       << endl;
+    cout << "__________________________________________________________________"
+            "______________"
+         << endl;
+    cout << "4. Calcular promedio de temperatura en un mes especificado"
+         << endl;
+    cout << "__________________________________________________________________"
+            "______________"
+         << endl;
+    cout << "5. Calcular mayor promedio de humedad con relacion a una "
+            "condicion meteorologica"
+         << endl;
+    cout << "__________________________________________________________________"
+            "______________"
+         << endl;
+    cout << "5. Calcular menor promedio de humedad con relacion a una "
+            "condicion meteorologica"
+         << endl;
+    cout << "__________________________________________________________________"
+            "______________"
+         << endl;
+    cout << "6. Mostrar datos meteorológicos por rango de fechas" << endl;
+    cout << "__________________________________________________________________"
+            "______________"
+         << endl;
+    cout << "7. Agregar datos meteorológicos" << endl;
+    cout << "__________________________________________________________________"
+            "______________"
+         << endl;
+    cout << "8. Salir" << endl;
+    cout << "__________________________________________________________________"
+            "______________"
+         << endl;
+    cout << "Ingrese su opción: ";
+    cin >> opcion;
+
+    switch (opcion) {
+    case 1:
+      imprimirDatosMeteorologicos(datos, numDatos);
+
+      break;
+    case 2:
+      encontrarMaximaTemperatura(datos, numDatos);
+
+       break;
+    case 3:
+        encontrarMinimaTemperatura(datos, numDatos);
+
+      break;
+    case 4:
+      calcularPromedioTemperaturaMes(datos, numDatos);
+
+      break;
+    case 5:
+      calcularMayorPromedioHumedad(datos, numDatos);
+
+      break;
+    case 6:
+      calcularMenorPromedioHumedad(datos, numDatos);
+
+      break;
+    case 7:
+      mostrarDatosMeteorologicosPorRango(datos, numDatos);
+
+      break;
+    case 8:
+      agregarDatosMeteorologicos(datos, numDatos);
+
+      break;
+    case 9:
+      cout << "Saliendo..." << endl;
+      break;
+    default:
+      cout << "Opción no válida. Inténtelo de nuevo." << endl;
+      break;
+    }
+    if (!continuarPrograma()) {
+      cout << "Gracias por usar el programa. ¡Hasta luego!" << endl;
+      return 1; // Sale inmediatamente de la función menu
+    }
+
+  } while (opcion != 8);
+
+  return 0;
+}
