@@ -1,0 +1,56 @@
+Para una exposición sobre el código de la aplicación de análisis meteorológico, un esquema bien estructurado puede ayudar a presentar la información de manera clara y lógica. Aquí tienes una sugerencia de esquema que puedes seguir:
+
+### 1. Introducción ESTEBANA
+- *Presentación del equipo*: Introducirte a ti y a tu compañera.
+- *Objetivo de la presentación*: Explicar brevemente de qué trata el proyecto y qué aspectos se van a cubrir durante la exposición.
+
+### 2. Visión General del Proyecto ESTEBANA
+- *Propósito del proyecto*: Explicar el objetivo principal de la aplicación (por ejemplo, análisis de datos meteorológicos y estimación de probabilidades).
+- *Características clave*: Enumerar las funcionalidades principales de la aplicación.
+
+### 3. Estructura del Código GABISABI
+- *Organización del código*: Describir cómo está estructurado el código (por ejemplo, separación de funciones, uso de estructuras de datos).
+- *Explicación de estructuras*:
+  - *Usuario*: Detallar los atributos y su propósito.
+  - *DatosMeteorologicos*: Detallar los atributos y su propósito.
+
+### 4. Funcionalidades Principales
+- *Gestión de Usuarios*: GABISABI
+  - *Registro de usuarios*: Explicar cómo se registra un nuevo usuario y cómo se verifica si el usuario ya existe.
+  - *Inicio de sesión*: Describir el proceso de autenticación de usuarios.
+  - *Mostrar usuarios registrados*: Explicar cómo se listan los usuarios registrados.
+
+- *Carga y Almacenamiento de Datos*: ESTABANA
+  - *Carga de datos meteorológicos*: Explicar cómo se cargan los datos desde un archivo.
+  - *Guardar datos meteorológicos*: Explicar cómo se guardan los datos actualizados.
+
+- *Análisis de Datos Meteorológicos*: ESTABANA
+  - *Rango de fechas*: Mostrar cómo se filtran los datos meteorológicos por rango de fechas.
+  - *Cálculo de temperaturas*: Explicar cómo se encuentran las temperaturas máxima y mínima.
+  - *Promedios*: Detallar cómo se calculan los promedios de temperatura y humedad.
+  - *Probabilidades*: Describir cómo se estiman las probabilidades de incendio y tormenta.
+
+### 5. Interfaz del Usuario GABISABI
+- *Menú Principal*: Explicar cómo los usuarios interactúan con la aplicación a través del menú principal.
+- *Menú de Análisis Meteorológico*: Describir las opciones disponibles para el análisis de datos meteorológicos.
+
+### 6. Persistencia de Datos GABISABI
+- *Archivos binarios*: Explicar cómo se almacenan los usuarios en un archivo binario.
+- *Archivos de texto*: Describir cómo se cargan y guardan los datos meteorológicos en archivos de texto.
+
+### 7. Ejemplo de Uso SECXIOOOOOOOOO
+- *Demostración*: Mostrar un ejemplo paso a paso de cómo un usuario interactuaría con la aplicación, desde el inicio de sesión hasta la ejecución de un análisis de datos.
+
+### 8. Conclusión SECXIOOOOOOOOOOOOO
+- *Resumen*: Recapitular los puntos clave de la presentación.
+- *Beneficios del proyecto*: Resaltar las ventajas y posibles aplicaciones prácticas de la aplicación.
+- *Preguntas y respuestas*: Abrir la sesión para preguntas del público.
+
+### 9. Agradecimientos
+- Agradecer al público por su atención y a cualquier persona o entidad que haya contribuido al proyecto.
+
+### Recursos Visuales
+- *Diapositivas*: Preparar diapositivas para cada sección del esquema. Utiliza capturas de pantalla del código, diagramas de flujo, y ejemplos de ejecución para ilustrar los puntos clave.
+- *Código en vivo*: Si es posible, hacer una demostración en vivo de la aplicación.
+
+Este esquema te ayudará a organizar tu presentación de manera efectiva y asegurará que cubras todos los aspectos importantes del proyecto de manera clara y concisa.

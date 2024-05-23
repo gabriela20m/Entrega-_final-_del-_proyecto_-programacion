@@ -191,8 +191,18 @@ struct Usuario {
 
 // Sobrecarga del operador << para el struct Usuario
 ostream &operator<<(ostream &os, const Usuario &usuario) {
-  os << "Usuario " << usuario.usuario << ", Contraseña " << usuario.contrasena;
-  return os;
+    os << "Usuario " << usuario.usuario << ", Contraseña " << usuario.contrasena;
+    return os;
+}
+
+void salidaTxt(const Usuario &usuario) {
+    ofstream salida("salida.txt");
+    if (salida.is_open()) {
+        salida << "RESULTADOS DEL ANÁLISIS METEREOLÓGICO:\n";
+        salida << ">>\n\nUsuario que hace el reporte: " << usuario.usuario << "\n\n";
+    } else {
+        cerr << "No se pudo abrir el archivo salida.txt" << endl;
+    }
 }
 
 const int MAX_USUARIOS = 100; // Máximo número de usuarios
@@ -294,8 +304,8 @@ bool iniciarSesion(const Usuario usuarios[], int numUsuarios) {
     if (usuarios[i].usuario == nombreUsuario &&
         usuarios[i].contrasena == contrasena) {
       cout << endl
-           << "Inicio de sesión exitoso. Bienvenido, ¡" << nombreUsuario << "!"
-           << endl;
+           << "Inicio de sesión exitoso. Bienvenido, ¡" << nombreUsuario << "!"<< endl;
+            salidaTxt(usuarios[i]);
       return true;
     }
   }
@@ -307,15 +317,6 @@ bool iniciarSesion(const Usuario usuarios[], int numUsuarios) {
 
 //-----------------------------------------------------------------------------------------------------------------------------------------------
 
-void salidaTxt(const Usuario &usuario) {
-  ofstream salida("salida.txt", ios::app);
-  if (salida.is_open()) {
-    salida << "RESULTADOS DEL ANÁLISIS METEREOLÓGICO:\n";
-    salida << ">>\n\nUsuario que hace el reporte: " << usuario << "\n\n";
-  } else {
-    cerr << "No se pudo abrir el archivo salida.txt" << endl;
-  }
-}
 
 // Función para mostrar todos los datos meteorológicos, no se llama como tal
 // pero dado el caso que se necesite se instaura
@@ -592,114 +593,104 @@ void mostrarDatosMeteorologicosPorRango(const DatosMeteorologicos datos[],
   salida.close();
 }
 
+
 void probabilidadIncendio(const DatosMeteorologicos datos[], int numDatos) {
+    int anio, mes, dia;
+    bool fechaValida = false;
 
-  int anio, mes, dia;
-  bool fechaValida = false;
+    cout << "Ingrese la fecha (en el formato AAAA MM DD): " << endl;
+    cin >> anio >> mes >> dia;
 
-  cout << "Ingrese la fecha (en el formato AAAA MM DD): " << endl;
-  cin >> anio >> mes >> dia;
-
-  cout << "Proceso realizado exitosamente y añadido al archivo salida.txt";
-  ofstream salida("salida.txt", ios::app);
-  for (int i = 0; i < numDatos; i++) {
-    if (datos[i].anio == anio && datos[i].mes == mes && datos[i].dia == dia) {
-      fechaValida = true;
-      salida << "7) --> Probabilidad de incendio: " << endl
-             << "Temperatura: " << datos[i].temperatura << "°C - "
-             << "Velocidad del viento: " << datos[i].velocidadViento
-             << " km/h - "
-             << "Condición meteorológica: " << datos[i].condicionMeteorologica
-             << endl;
-
-      ofstream salida("salida.txt", ios::app);
-      if (datos[i].temperatura > 30 &&
-          datos[i].condicionMeteorologica == "Soleada" &&
-          datos[i].velocidadViento >= 7 && datos[i].velocidadViento <= 10) {
-        salida << "Hay una alta probabilidad de incendio." << endl;
+    ofstream salida("salida.txt", ios::app);
+    if (!salida.is_open()) {
+        cerr << "Error al abrir el archivo salida.txt" << endl;
         return;
-      } else if (datos[i].temperatura >= 25 && datos[i].temperatura <= 30 &&
-                 datos[i].velocidadViento >= 3 &&
-                 datos[i].velocidadViento <= 5) {
-        salida << "Hay una probabilidad de incendio debido a temperatura "
-                  "ligeramente alta."
-               << endl;
-        return;
-      } else if (datos[i].temperatura >= 15 && datos[i].temperatura <= 20 &&
-                 datos[i].velocidadViento < 2) {
-        salida << "No hay probabilidad de incendio." << endl;
-        return;
-      } else {
-        salida << "No se puede determinar la probabilidad de incendio con los "
-                  "proporcionados de esta fecha."
-               << endl;
-        return;
-      }
     }
-    salida.close();
-  }
 
-  if (!fechaValida) {
-    cout << "No hay datos para la fecha especificada." << endl;
-  }
+    for (int i = 0; i < numDatos; ++i) {
+        if (datos[i].anio == anio && datos[i].mes == mes && datos[i].dia == dia) {
+            fechaValida = true;
+            salida << "7) --> Probabilidad de incendio: " << endl
+                   << "Temperatura: " << datos[i].temperatura << "°C - "
+                   << "Velocidad del viento: " << datos[i].velocidadViento << " km/h - "
+                   << "Condición meteorológica: " << datos[i].condicionMeteorologica << endl;
+
+            if (datos[i].temperatura > 30 &&
+                datos[i].condicionMeteorologica == "Soleada" &&
+                datos[i].velocidadViento >= 7 && datos[i].velocidadViento <= 10) {
+                salida << "Hay una alta probabilidad de incendio." << endl;
+            } else if (datos[i].temperatura >= 25 && datos[i].temperatura <= 30 &&
+                       datos[i].velocidadViento >= 3 &&
+                       datos[i].velocidadViento <= 5) {
+                salida << "Hay una probabilidad de incendio debido a temperatura ligeramente alta." << endl;
+            } else if (datos[i].temperatura >= 15 && datos[i].temperatura <= 20 &&
+                       datos[i].velocidadViento < 2) {
+                salida << "No hay probabilidad de incendio." << endl;
+            } else {
+                salida << "La probabilidad de incendio es baja." << endl;
+            }
+            break; // Salimos del bucle después de encontrar la primera coincidencia
+        }
+    }
+
+    salida.close();
+
+    if (!fechaValida) {
+        cout << "No hay datos para la fecha especificada." << endl;
+    } else {
+        cout << "Proceso realizado exitosamente y añadido al archivo salida.txt" << endl;
+    }
 }
+
 
 void probabilidadTormenta(const DatosMeteorologicos datos[], int numDatos) {
+    int anio, mes, dia;
+    bool fechaValidas = false;
 
-  int anio, mes, dia;
-  bool fechaValidas = false;
+    cout << "Ingrese la fecha (en el formato AAAA MM DD): " << endl;
+    cin >> anio >> mes >> dia;
 
-  cout << "Ingrese la fecha (en el formato AAAA MM DD): " << endl;
-  cin >> anio >> mes >> dia;
-
-  cout << "Proceso realizado exitosamente y añadido al archivo salida.txt";
-  ofstream salida("salida.txt", ios::app);
-  for (int i = 0; i < numDatos; ++i) {
-    if (datos[i].anio == anio && datos[i].mes == mes && datos[i].dia == dia) {
-      fechaValidas = true;
-      salida << "8) --> Probabilidad de tormenta o lluvia: " << endl
-             << "Presión Atmosférica: " << datos[i].presionAtmosferica
-             << "hPa - "
-             << "Húmedad: " << datos[i].humedad << "% - "
-             << "Condición meteorológica: " << datos[i].condicionMeteorologica
-             << endl;
-
-      if (datos[i].presionAtmosferica > 1010 &&
-          datos[i].condicionMeteorologica == "Lluvioso" &&
-          datos[i].humedad > 70) {
-        salida << "La probabilidad de tormenta es alta" << endl;
-        break;
-      } else {
-        salida << "La probabilidad de tormenta es baja" << endl;
-        break;
-      }
-      if (datos[i].presionAtmosferica < 1010 &&
-          datos[i].condicionMeteorologica == "Lluvioso" &&
-          datos[i].humedad > 70) {
-        salida << "La probabilidad de lluvia es alta" << endl;
-        break;
-      } else {
-        salida << "La probabilidad de lluvia es baja" << endl;
-        break;
-      }
-      if (datos[i].presionAtmosferica == 1010 &&
-          datos[i].condicionMeteorologica == "Lluvioso" &&
-          datos[i].humedad > 70) {
-        salida << "No se puede determinar la probabilidad de lluvia o tormenta "
-                  "con los proporcionados de esta fecha."
-               << endl;
-        break;
-      }
+    ofstream salida("salida.txt", ios::app);
+    if (!salida.is_open()) {
+        cerr << "Error al abrir el archivo salida.txt" << endl;
+        return;
     }
+
+    for (int i = 0; i < numDatos; ++i) {
+        if (datos[i].anio == anio && datos[i].mes == mes && datos[i].dia == dia) {
+            fechaValidas = true;
+            salida << "8) --> Probabilidad de tormenta o lluvia: " << endl
+                   << "Presión Atmosférica: " << datos[i].presionAtmosferica << "hPa - "
+                   << "Húmedad: " << datos[i].humedad << "% - "
+                   << "Condición meteorológica: " << datos[i].condicionMeteorologica << endl;
+
+            if (datos[i].presionAtmosferica > 1010 &&
+                datos[i].condicionMeteorologica == "Lluvioso" &&
+                datos[i].humedad > 70) {
+                salida << "La probabilidad de tormenta es alta" << endl;
+            } else if (datos[i].presionAtmosferica < 1010 &&
+                       datos[i].condicionMeteorologica == "Lluvioso" &&
+                       datos[i].humedad > 70) {
+                salida << "La probabilidad de lluvia es alta" << endl;
+            } else if (datos[i].presionAtmosferica == 1010 &&
+                       datos[i].condicionMeteorologica == "Lluvioso" &&
+                       datos[i].humedad > 70) {
+                salida << "No se puede determinar la probabilidad de lluvia o tormenta con los datos proporcionados de esta fecha." << endl;
+            } else {
+                salida << "La probabilidad de tormenta o lluvia es baja" << endl;
+            }
+            break; // Salimos del bucle después de encontrar la primera coincidencia
+        }
+    }
+
     salida.close();
-  }
 
-  if (!fechaValidas) {
-    cout << "No hay datos para la fecha especificada." << endl;
-    return;
-  }
+    if (!fechaValidas) {
+        cout << "No hay datos para la fecha especificada." << endl;
+    } else {
+        cout << "Proceso realizado exitosamente y añadido al archivo salida.txt" << endl;
+    }
 }
-
 void agregarDatosMeteorologicos(DatosMeteorologicos datos[], int &numDatos,
                                 int anioMin, int mesMin, int diaMin,
                                 int anioMax, int mesMax, int diaMax) {
